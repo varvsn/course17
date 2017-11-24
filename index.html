@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FkingJS</title>
+</head>
+
+<style>
+    .style-green {
+        background-color: yellow;
+	font-size: 80%;
+    }
+     .wrap {
+        border: 2px solid blue;
+    }
+
+     #test_hover {
+    cursor:pointer;
+    display:none;
+    background-color: #fff;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.2);
+    border: 2px solid #BBB;
+    width:155px;
+    height:115px;
+    color: #333;
+    font-family: 'FrutigerRegular';
+    position:absolute;
+    top:180px;
+    left:250px;
+    z-index:10002;
+}
+
+#test_hover img {
+    position:absolute;
+    top:2px;
+    left:2px;
+}
+
+.response {
+cursor:pointer;
+}
+
+</style>
+<body>
+
+<div class="requests">
+    <ul class="results"></ul>
+    <button id="make-request-get-post">Test ajax GET post</button>
+    <ul class="results"></ul>
+    <button id="make-request-get-comments">Test ajax GET comments</button>
+    <ul class="results"></ul>
+    <form id="post_form">
+    Title<input type=text name="title">
+    Text<input type=text name="txt">
+    UserUD<input type=text name="uid">
+    <button id="make-request-post-post" type="button">Test ajax POST post</button>
+    </form>
+</div>
+
+<div class="responses">
+<div class="mouse" id="test_hover">
+ <img src="1504284610459595037320.jpg" width="150" height="110" alt="КОТЭ" />
+</div>
+<p> Response here </p>
+<ul class="response"></ul>
+</div>
+
+<button class="wrap">wrap/unwrap</button>
+
+<script type="application/javascript" src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script type="application/javascript">
+    'use strict';
+    (function (window, document, $) {
+        function sendRequest(send_method, param, post_data) {  //post_data используется только для формы
+            var results = $('.response', '.responses');
+            var request = $.ajax({
+                url: 'https://jsonplaceholder.typicode.com/' + param,
+                crossDomain: true,
+                type: send_method,
+                data: post_data,
+                dataType: 'json'
+            });
+            request.done(function (data, textStatus, jqXHR) {
+                console.log(data, textStatus, jqXHR);
+                var result = $('<li>').addClass('style-green').text(JSON.stringify(data));
+                //results.append(result);  //Добавить <li>
+		results.html(result);  //Всунуть <li>, меняем текст в блоке $('.response', '.responses');
+            });
+            request.fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR, textStatus, errorThrown);
+            });
+        }
+
+
+        $(document).ready(function() {
+            $('#make-request-get-post').click(function() {
+                sendRequest('GET', 'posts/1');
+            });
+            $('#make-request-get-comments').click(function() {
+                sendRequest('GET', 'posts/1/comments');
+            });
+            $('#make-request-post-post').click(function() {
+                var data = {
+                    title: $('#post_form :input[name=title]').val(), //берем по ID формы и name инпута. val() - это польз. значение в инпуте
+                    body: 'bar',
+                    userId: 1
+                };
+                console.log(data);
+                sendRequest('POST', 'posts', data);
+            });
+
+           $('.responses').hover(
+           function(){
+                console.log('Button hover!!');
+                },
+           function(){
+                console.log('unhover!');
+                });
+
+
+             var Tags = $( '.results' );
+             $( ".wrap" ).click(function() {
+             if ( Tags.parent().is( "div" ) ) {
+                 Tags.unwrap();
+             } else {
+                 Tags.wrap('<div class="wrap"></div>');
+             }
+             });
+
+
+               $('.responses').mousemove(function(event) { 
+                   var left = event.pageX - $(this).offset().left + 10;
+                   var top = event.pageY - $(this).offset().top + 130;
+                   $('#test_hover').css({top: top,left: left}).show();
+                   console.log (left, top);
+                });
+               $('.responses').mouseout(function() {
+                   $('#test_hover').hide();
+                 });
+
+
+
+
+
+
+        });
+    })(window, document, jQuery);
+</script>
+
+</body>
+</html>
